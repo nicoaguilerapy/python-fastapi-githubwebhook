@@ -2,11 +2,11 @@ from fastapi import FastAPI, Request, HTTPException
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import json
 from decouple import config
 import os
 from datetime import datetime
 import uvicorn
+import json
 
 app = FastAPI()
 
@@ -21,14 +21,10 @@ EMAIL_TO = config("EMAIL_TO")
 @app.post("/webhook")
 async def github_webhook(request: Request):
     try:
-        payload = await request.json()
+        payload = await request.json() 
+        send_email(payload)
         
-        if 'ref' in payload and payload['ref'] == 'refs/heads/master_main':
-            commit_message = payload['head_commit']['message']
-            commit_url = payload['head_commit']['url']
-            send_email(commit_message, commit_url)
-        
-        return {"commit_message": commit_message, "commit_url":commit_url}
+        return {"message": "Webhook received successfully"}
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -37,14 +33,15 @@ async def github_webhook(request: Request):
 async def test(request: Request):
     try:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        return {"fechahora": current_time, "deploy":config("DEPLOY")}
+        return {"fechahora": current_time, "deploy": config("DEPLOY")}
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-def send_email(commit_message, commit_url):
-    subject = 'New commit in master_main branch'
-    body = f'There was a new commit in the master_main branch.\n\nCommit message: {commit_message}\nCommit URL: {commit_url}'
+def send_email(payload):
+    payload = json.dumps(payload, separators=(',', ':'))
+    subject = 'GITHUB CAMBIOS'
+    body = f'PAYLOAD: {payload}'
 
     msg = MIMEMultipart()
     msg['From'] = EMAIL_FROM
