@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Response
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -24,7 +24,8 @@ async def github_webhook(request: Request):
         payload = await request.json() 
         send_email(payload)
         
-        return {"message": "Webhook received successfully"}
+        return Response(content={"message": "Webhook received successfully"}, status_code=200, media_type="application/json")
+
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -33,8 +34,8 @@ async def github_webhook(request: Request):
 async def test(request: Request):
     try:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        return {"fechahora": current_time, "deploy": config("DEPLOY")}
-
+         
+        return Response(content={"fechahora": current_time, "deploy": config("DEPLOY")}, status_code=200, media_type="application/json")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
