@@ -26,7 +26,7 @@ async def github_webhook(request: Request):
         return Response(content={"message": "Webhook received successfully"}, status_code=200, media_type="application/json")
 
     except Exception as e:
-        return Response(content={"error": "Error durante el proceso"}, status_code=400, media_type="application/json")
+        raise HTTPException(status_code=400, detail=str(e))
     
 @app.get("/")
 async def test(request: Request):
