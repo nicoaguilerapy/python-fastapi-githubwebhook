@@ -33,7 +33,7 @@ async def github_webhook(request: Request):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     
-@app.get("/test")
+@app.get("/")
 async def test(request: Request):
     try:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
