@@ -7,6 +7,7 @@ import os
 from datetime import datetime
 import uvicorn
 import json
+import threading
 
 app = FastAPI()
 
@@ -18,29 +19,39 @@ SMTP_PASSWORD = config("SMTP_PASSWORD")
 EMAIL_FROM = config("SMTP_USERNAME")
 EMAIL_TO = config("EMAIL_TO")
 
+
 @app.post("/webhook")
 async def github_webhook(request: Request):
     try:
-        payload = await request.json() 
-        send_email(payload)
-        return Response(content=json.dumps({"message": "Webhook received successfully"}), status_code=200, media_type="application/json")
+        payload = await request.json()
+        
+        # Ejecutar send_email en un hilo separado
+        threading.Thread(target=send_email, args=(payload,)).start()
+        
+        return Response(content=json.dumps({"message": "OPERACIÓN EXITOSA"}), status_code=200, media_type="application/json")
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-    
+
+
 @app.get("/")
 async def test(request: Request):
     try:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-         
+
         return Response(content=json.dumps({"fechahora": current_time, "deploy": config("DEPLOY")}), status_code=200, media_type="application/json")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
 def send_email(payload):
-    payload = json.dumps(payload, indent=4)
-    subject = 'GITHUB CAMBIOS'
-    body = f'PAYLOAD: {payload}'
+    subject = 'NUEVO COMMIR EN MASTER_MAIN'
+    commit_author = payload['head_commit']['author']['name']
+    commit_message = payload['head_commit']['message']
+    commit_url = payload['head_commit']['url']
+    commit_date = payload['head_commit']['timestamp']
+
+    body = f'Commit by: {commit_author}\nCommit message: {commit_message}\nCommit URL: {commit_url}\nCommit date: {commit_date}'
 
     msg = MIMEMultipart()
     msg['From'] = EMAIL_FROM
@@ -60,6 +71,7 @@ def send_email(payload):
     except Exception as e:
         print(f"Failed to send email: {e}")
 
+
 if __name__ == "__main__":
     if config("DEPLOY") == "N":
         uvicorn.run(app, host="0.0.0.0", port=8001)
@@ -67,6 +79,8 @@ if __name__ == "__main__":
         if "DYNO" in os.environ:
             workers = int(os.environ.get("WEB_CONCURRENCY", 1))
             timeout = int(os.environ.get("WEB_TIMEOUT", 120))
-            uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), workers=workers, timeout_keep_alive=timeout)
+            uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get(
+                "PORT", 8000)), workers=workers, timeout_keep_alive=timeout)
         else:
-            uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+            uvicorn.run(app, host="0.0.0.0", port=int(
+                os.environ.get("PORT", 8000)))
