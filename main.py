@@ -23,7 +23,7 @@ async def github_webhook(request: Request):
     try:
         payload = await request.json() 
         send_email(payload)
-        return Response(content={"message": "Webhook received successfully"}, status_code=200, media_type="application/json")
+        return Response(content=json.dumps({"message": "Webhook received successfully"}), status_code=200, media_type="application/json")
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -33,7 +33,7 @@ async def test(request: Request):
     try:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
          
-        return Response(content={"fechahora": current_time, "deploy": config("DEPLOY")}, status_code=200, media_type="application/json")
+        return Response(content=json.dumps({"fechahora": current_time, "deploy": config("DEPLOY")}), status_code=200, media_type="application/json")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
