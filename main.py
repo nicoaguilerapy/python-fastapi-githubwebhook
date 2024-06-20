@@ -23,12 +23,10 @@ async def github_webhook(request: Request):
     try:
         payload = await request.json() 
         send_email(payload)
-        
         return Response(content={"message": "Webhook received successfully"}, status_code=200, media_type="application/json")
 
-
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return Response(content={"error": "Error durante el proceso"}, status_code=400, media_type="application/json")
     
 @app.get("/")
 async def test(request: Request):
@@ -40,7 +38,7 @@ async def test(request: Request):
         raise HTTPException(status_code=400, detail=str(e))
 
 def send_email(payload):
-    payload = json.dumps(payload, separators=(',', ':'))
+    payload = json.dumps(payload, indent=4)
     subject = 'GITHUB CAMBIOS'
     body = f'PAYLOAD: {payload}'
 
