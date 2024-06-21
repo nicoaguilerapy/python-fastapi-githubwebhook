@@ -24,8 +24,6 @@ EMAIL_TO = config("EMAIL_TO")
 async def github_webhook(request: Request):
     try:
         payload = await request.json()
-        
-        # Ejecutar send_email en un hilo separado
         threading.Thread(target=send_email, args=(payload,)).start()
         
         return Response(content=json.dumps({"message": "OPERACIÓN EXITOSA"}), status_code=200, media_type="application/json")
@@ -45,6 +43,8 @@ async def test(request: Request):
 
 
 def send_email(payload):
+    if payload['red'] != 'refs/heads/master_main':
+        return
     subject = 'NUEVO COMMIR EN MASTER_MAIN'
     commit_author = payload['head_commit']['author']['name']
     commit_message = payload['head_commit']['message']
