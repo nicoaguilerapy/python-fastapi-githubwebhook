@@ -43,7 +43,7 @@ async def test(request: Request):
 
 
 def send_email(payload):
-    if payload['red'] != 'refs/heads/master_main':
+    if payload['ref'] != 'refs/heads/master_main':
         return
     subject = 'NUEVO COMMIR EN MASTER_MAIN'
     commit_author = payload['head_commit']['author']['name']
