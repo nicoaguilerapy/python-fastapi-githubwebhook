@@ -45,13 +45,32 @@ async def test(request: Request):
 def send_email(payload):
     if payload['ref'] != 'refs/heads/master_main':
         return
-    subject = 'NUEVO COMMIR EN MASTER_MAIN'
+    subject = 'NUEVO COMMIT EN MASTER_MAIN'
     commit_author = payload['head_commit']['author']['name']
     commit_message = payload['head_commit']['message']
     commit_url = payload['head_commit']['url']
     commit_date = payload['head_commit']['timestamp']
 
-    body = f'Commit by: {commit_author}\nCommit message: {commit_message}\nCommit URL: {commit_url}\nCommit date: {commit_date}'
+    # Listar archivos modificados, eliminados y agregados
+    added_files = payload['head_commit'].get('added', [])
+    removed_files = payload['head_commit'].get('removed', [])
+    modified_files = payload['head_commit'].get('modified', [])
+
+    body = f"""
+    Commit by: {commit_author}
+    Commit message: {commit_message}
+    Commit URL: {commit_url}
+    Commit date: {commit_date}
+
+    Agregados ({len(added_files)}):
+    {', '.join(added_files)}
+
+    Eliminados ({len(removed_files)}):
+    {', '.join(removed_files)}
+
+    Modificados ({len(modified_files)}):
+    {', '.join(modified_files)}
+    """
 
     msg = MIMEMultipart()
     msg['From'] = EMAIL_FROM
