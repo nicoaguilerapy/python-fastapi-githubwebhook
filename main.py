@@ -63,13 +63,13 @@ def send_email(payload):
     Commit date: {commit_date}
 
     Agregados ({len(added_files)}):
-    {', '.join(added_files)}
+    {'\n'.join(added_files)}
 
     Eliminados ({len(removed_files)}):
-    {', '.join(removed_files)}
+    {'\n'.join(removed_files)}
 
     Modificados ({len(modified_files)}):
-    {', '.join(modified_files)}
+    {'\n'.join(modified_files)}
     """
 
     msg = MIMEMultipart()
