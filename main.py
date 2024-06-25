@@ -57,20 +57,20 @@ def send_email(payload):
     modified_files = payload['head_commit'].get('modified', [])
 
     body = f"""
-    Commit by: {commit_author}
-    Commit message: {commit_message}
-    Commit URL: {commit_url}
-    Commit date: {commit_date}
+        Commit by: {commit_author}
+        Commit message: {commit_message}
+        Commit URL: {commit_url}
+        Commit date: {commit_date}
 
-    Agregados ({len(added_files)}):
-    {'\n'.join(added_files)}
+        Agregados ({len(added_files)}):
+        {chr(10).join(added_files)}
 
-    Eliminados ({len(removed_files)}):
-    {'\n'.join(removed_files)}
+        Eliminados ({len(removed_files)}):
+        {chr(10).join(removed_files)}
 
-    Modificados ({len(modified_files)}):
-    {'\n'.join(modified_files)}
-    """
+        Modificados ({len(modified_files)}):
+        {chr(10).join(modified_files)}
+        """
 
     msg = MIMEMultipart()
     msg['From'] = EMAIL_FROM
