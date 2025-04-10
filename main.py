@@ -17,7 +17,7 @@ SMTP_PORT = int(config("SMTP_PORT"))
 SMTP_USERNAME = config("SMTP_USERNAME")
 SMTP_PASSWORD = config("SMTP_PASSWORD")
 EMAIL_FROM = config("SMTP_USERNAME")
-EMAIL_TO = config("EMAIL_TO")
+EMAIL_TO = [email.strip() for email in config("EMAIL_TO").split(",")]
 BRANCH = config("BRANCH")
 
 
