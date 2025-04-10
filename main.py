@@ -18,6 +18,7 @@ SMTP_USERNAME = config("SMTP_USERNAME")
 SMTP_PASSWORD = config("SMTP_PASSWORD")
 EMAIL_FROM = config("SMTP_USERNAME")
 EMAIL_TO = config("EMAIL_TO")
+BRANCH = config("BRANCH")
 
 
 @app.post("/webhook")
@@ -43,9 +44,9 @@ async def test(request: Request):
 
 
 def send_email(payload):
-    if payload['ref'] != 'refs/heads/master_main':
+    if payload['ref'] != 'refs/heads/'+BRANCH:
         return
-    subject = 'NUEVO COMMIT EN MASTER_MAIN'
+    subject = 'NUEVO COMMIT EN '+BRANCH
     commit_author = payload['head_commit']['author']['name']
     commit_message = payload['head_commit']['message']
     commit_url = payload['head_commit']['url']
